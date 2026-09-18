@@ -62,6 +62,15 @@ const RADII  = [0, 16, 30, 50];   // por tamaño 1, 2, 3
 const SPEEDS = [0, 85, 55, 32];   // velocidad base por tamaño
 const POINTS = [0, 100, 50, 20];  // puntos por tamaño
 
+// Silueta fija con muesca, usada como variante de asteroide grande.
+// Vértices normalizados a radio 1 (se escalan por this.radius).
+const NOTCHED_SHAPE = [
+  [-0.05, -0.99], [ 0.49, -0.81], [ 0.39, -0.20], [ 0.96, -0.02],
+  [ 0.80,  0.60], [ 0.30,  0.58], [ 0.06,  0.98], [-0.64,  0.64],
+  [-0.97,  0.06], [-0.82, -0.58],
+];
+const NOTCHED_CHANCE = 0.3;  // probabilidad de que un asteroide grande use esta silueta
+
 class Asteroid {
   constructor(x, y, size = 3) {
     this.x    = x;
@@ -76,6 +85,12 @@ class Asteroid {
     this.vy = Math.sin(angle) * speed;
     this.rotSpeed = rand(-1.2, 1.2);
     this.rot = rand(0, Math.PI * 2);
+
+    // Variante grande con silueta fija
+    if (size === 3 && Math.random() < NOTCHED_CHANCE) {
+      this.verts = NOTCHED_SHAPE.map(([vx, vy]) => [vx * this.radius, vy * this.radius]);
+      return;
+    }
 
     // Polígono irregular
     const n = randInt(8, 13);
